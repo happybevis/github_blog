@@ -109,10 +109,9 @@ Thermal和系统稳定性管理一直是移动设备的重中之重，随着Kern
 
 ### BCL（Battery Current Limit）介绍
 
-``` 
-PMIC芯片中的BCL硬件会对系统的供给电压和电流进行采样，当其达到预设安全阈值时，强行呼叫操作系统采取拉低系统功耗的行为（Ex. 降低cpu/Gpu频率）来保证电池和系统的安全性，避免Under-Voltage Lockout (UVLO) 和 Over-Current 的发生。
 
-```
+> PMIC芯片中的BCL硬件会对系统的供给电压和电流进行采样，当其达到预设安全阈值时，强行呼叫操作系统采取拉低系统功耗的行为（Ex. 降低cpu/Gpu频率）来保证电池和系统的安全性，避免Under-Voltage Lockout (UVLO) 和 Over-Current 的发生。
+
 
 首先来几个常见的名词解释：
 
@@ -151,144 +150,149 @@ qcom,thermal-handle = <&msm_thermal_freq>;
 ```
 &thermal_zones {
 	ibat-high {
-		polling-delay-passive = <0>;
-		polling-delay = <0>;
-		thermal-governor = "step_wise";
-		thermal-sensors = <&bcl_sensor 0>;
+	 polling-delay-passive = <0>;
+	 polling-delay = <0>;
+	 thermal-governor = "step_wise";
+	 thermal-sensors = <&bcl_sensor 0>;
 
-		trips {
-			ibat_high: low-ibat {
-				temperature = <5000>;
-				hysteresis = <200>;
-				type = "passive";
-			};
-		};
-	};
+	 trips {
+		 ibat_high: low-ibat {
+			 temperature = <5000>;
+			 hysteresis = <200>;
+			 type = "passive";
+		 };
+	  };
+  };
 	ibat-vhigh {
-		polling-delay-passive = <0>;
-		polling-delay = <0>;
-		thermal-governor = "step_wise";
-		thermal-sensors = <&bcl_sensor 1>;
+	  polling-delay-passive = <0>;
+	  polling-delay = <0>;
+	  thermal-governor = "step_wise";
+	  thermal-sensors = <&bcl_sensor 1>;
 
-		trips {
-			ibat_vhigh: ibat_vhigh {
-				temperature = <6000>;
-				hysteresis = <100>;
-				type = "passive";
-			};
-		};
+	  trips {
+		 ibat_vhigh: ibat_vhigh {
+		         temperature = <6000>;
+			 hysteresis = <100>;
+			 type = "passive";
+		  };
+	  };
 	};
 	vbat {
-		polling-delay-passive = <100>;
-		polling-delay = <0>;
-		thermal-governor = "low_limits_cap";
-		thermal-sensors = <&bcl_sensor 2>;
-		tracks-low;
+	  polling-delay-passive = <100>;
+	  polling-delay = <0>;
+	  thermal-governor = "low_limits_cap";
+	  thermal-sensors = <&bcl_sensor 2>;
+	  tracks-low;
 
-		trips {
-			low_vbat: low-vbat {
-				temperature = <3200>; //对应上面的qcom,vph-low-threshold-uv，电压低于3.2V时，对下方定义的cooling-maps设备进行Thermal Max LIMIT限制操作。
-				hysteresis = <100>; //迟滞值，在governer为"low_limits_cap"情况下，撤销前面对cpu进行Thermal限制操作的阈值为temperature + hysteresis，即3.3V。注意此处的temperature其实就是电压，bcl driver为了能通用到Thermal core框架，在get temperature的实现中对其进行了转换。
-				type = "passive";
-			};
-		};
-		cooling-maps {
-			vbat_cpu4 {
-				trip = <&low_vbat>;
-				cooling-device =
-					<&CPU4 THERMAL_MAX_LIMIT
-						THERMAL_MAX_LIMIT>;
-			};
-			vbat_cpu5 {
-				trip = <&low_vbat>;
-				cooling-device =
-					<&CPU5 THERMAL_MAX_LIMIT
-						THERMAL_MAX_LIMIT>;
-			};
-			vbat_map6 {
-				trip = <&low_vbat>;
-				cooling-device =
-					<&CPU6 THERMAL_MAX_LIMIT
-						THERMAL_MAX_LIMIT>;
-			};
-			vbat_map7 {
-				trip = <&low_vbat>;
-				cooling-device =
-					<&CPU7 THERMAL_MAX_LIMIT
-						THERMAL_MAX_LIMIT>;
-			};
-		};
+	     trips {
+		 low_vbat: low-vbat {
+		 temperature = <3200>; //对应上面的qcom,vph-low-threshold-uv，
+		 电压低于3.2V时，对下方定义的cooling-maps设备进行Thermal Max LIMIT限制操作。
+		 hysteresis = <100>; //迟滞值，在governer为"low_limits_cap"情况下，
+		 撤销前面对cpu进行Thermal限制操作的阈值为temperature + hysteresis，即3.3V。
+		 注意此处的temperature其实就是电压，bcl driver为了能通用到Thermal core框架，
+		 在get temperature的实现中对其进行了转换。
+			 type = "passive";
+		 };
+	 };
+	    cooling-maps {
+		  vbat_cpu4 {
+			  trip = <&low_vbat>;
+			  cooling-device =
+				  <&CPU4 THERMAL_MAX_LIMIT
+					  THERMAL_MAX_LIMIT>;
+		  };
+		  vbat_cpu5 {
+			  trip = <&low_vbat>;
+			  cooling-device =
+				  <&CPU5 THERMAL_MAX_LIMIT
+					  THERMAL_MAX_LIMIT>;
+		  };
+		  vbat_map6 {
+			  trip = <&low_vbat>;
+			  cooling-device =
+				  <&CPU6 THERMAL_MAX_LIMIT
+					  THERMAL_MAX_LIMIT>;
+		  };
+		  vbat_map7 {
+			  trip = <&low_vbat>;
+			  cooling-device =
+				  <&CPU7 THERMAL_MAX_LIMIT
+					  THERMAL_MAX_LIMIT>;
+		  };
+	  };
 	};
 	vbat_low {
-		polling-delay-passive = <0>;
-		polling-delay = <0>;
-		thermal-governor = "low_limits_cap";
-		thermal-sensors = <&bcl_sensor 3>;
-		tracks-low;
+	  polling-delay-passive = <0>;
+	  polling-delay = <0>;
+	  thermal-governor = "low_limits_cap";
+	  thermal-sensors = <&bcl_sensor 3>;
+	  tracks-low;
 
-		trips {
-			low-vbat {
-				temperature = <2800>;
-				hysteresis = <0>;
-				type = "passive";
-			};
-		};
+	  trips {
+		  low-vbat {
+			  temperature = <2800>;
+			  hysteresis = <0>;
+			  type = "passive";
+		  };
+	  };
 	};
 	vbat_too_low {
-		polling-delay-passive = <0>;
-		polling-delay = <0>;
-		thermal-governor = "low_limits_cap";
-		thermal-sensors = <&bcl_sensor 4>;
-		tracks-low;
+	     polling-delay-passive = <0>;
+	     polling-delay = <0>;
+	     thermal-governor = "low_limits_cap";
+	     thermal-sensors = <&bcl_sensor 4>;
+	     tracks-low;
 
-		trips {
-			low-vbat {
-				temperature = <2600>;
-				hysteresis = <0>;
-				type = "passive";
-			};
-		};
+	  trips {
+		  low-vbat {
+			  temperature = <2600>;
+			  hysteresis = <0>;
+			  type = "passive";
+		  };
+	   };
 	};
 	soc {
-		polling-delay-passive = <100>;
-		polling-delay = <0>;
-		thermal-governor = "low_limits_cap";
-		thermal-sensors = <&bcl_sensor 5>;
-		tracks-low;
+	   polling-delay-passive = <100>;
+	   polling-delay = <0>;
+	   thermal-governor = "low_limits_cap";
+	   thermal-sensors = <&bcl_sensor 5>;
+	   tracks-low;
 
-		trips {
-			low_soc: low-soc {
-				temperature = <10>; //对应于旧ktm时代dtsi中的qcom,soc-low-threshold，即当电量低于10%时对cooling-maps中的设备进行THERMAL_MAX_LIMIT的最大限制。
-				hysteresis = <0>; //迟滞值为0，即电量大于10%时将立即撤销对cpu的限制。
-				type = "passive";
-			};
-		};
-		cooling-maps {
-			soc_cpu4 {
-				trip = <&low_soc>;
-				cooling-device =
-					<&CPU4 THERMAL_MAX_LIMIT
-						THERMAL_MAX_LIMIT>;
-			};
-			soc_cpu5 {
-				trip = <&low_soc>;
-				cooling-device =
-					<&CPU5 THERMAL_MAX_LIMIT
-						THERMAL_MAX_LIMIT>;
-			};
-			soc_map6 {
-				trip = <&low_soc>;
-				cooling-device =
-					<&CPU6 THERMAL_MAX_LIMIT
-						THERMAL_MAX_LIMIT>;
-			};
-			soc_map7 {
-				trip = <&low_soc>;
-				cooling-device =
-					<&CPU7 THERMAL_MAX_LIMIT
-						THERMAL_MAX_LIMIT>;
-			};
-		};
+	  trips {
+		  low_soc: low-soc {
+			  temperature = <10>; //对应于旧ktm时代dtsi中的qcom,soc-low-threshold，
+			  即当电量低于10%时对cooling-maps中的设备进行THERMAL_MAX_LIMIT的最大限制。
+			  hysteresis = <0>; //迟滞值为0，即电量大于10%时将立即撤销对cpu的限制。
+			  type = "passive";
+		  };
+	  };
+	  cooling-maps {
+		  soc_cpu4 {
+			  trip = <&low_soc>;
+			  cooling-device =
+				  <&CPU4 THERMAL_MAX_LIMIT
+					  THERMAL_MAX_LIMIT>;
+		  };
+		  soc_cpu5 {
+			  trip = <&low_soc>;
+			  cooling-device =
+				  <&CPU5 THERMAL_MAX_LIMIT
+					  THERMAL_MAX_LIMIT>;
+		  };
+		  soc_map6 {
+			  trip = <&low_soc>;
+			  cooling-device =
+				  <&CPU6 THERMAL_MAX_LIMIT
+				  	THERMAL_MAX_LIMIT>;
+		  };
+		  soc_map7 {
+			  trip = <&low_soc>;
+			  cooling-device =
+				  <&CPU7 THERMAL_MAX_LIMIT
+					  THERMAL_MAX_LIMIT>;
+		  };
+	  };
 	};
 ```
 
@@ -328,45 +332,48 @@ Thermal-Core的管理框架，宏观逻辑上讲，是
 ```
 &thermal_zones {
 	vbat { //该Thermal Zone反应到Thermal Zone driver node下的name。
-		polling-delay-passive = <100>; //当被动散热的cooling device达到迟滞值扫描区间时，将进行polling值为100ms间隔的时时监控。
-		polling-delay = <0>;
-		thermal-governor = "low_limits_cap"; //vbat Thermal Zone想使用的thermal governor为"low_limits_cap"策略（系统支援的thermal policy常见如下几种：low_limits_floor、low_limits_cap、user_space、 step_wise，其中user_space策略表示该Thermal Zone的kernel部分，将仅仅在达到Thermal阈值时发送一个uevent供userspace处理，kernel部分除此之外什么也不做，userspace的处理者通常指的就是thermal-engine）。
-		thermal-sensors = <&bcl_sensor 2>; //该Thermal Zone所绑定的实际Thermal Sensor。
-		trips {  //阈值触发点设置域。
-			low_vbat: low-vbat {
-				temperature = <3200>; //温度(对该Thermal Zone而言，返回值反应的其实是电压值)
-				hysteresis = <100>; //迟滞值
-				type = "passive"; //将要绑定到该Thermal Zone的cooling device的类型，目前有三种可选：passive、active、critical。详见[补充1].
-			};
-		};
-		cooling-maps { //将要绑定的cooling device
-			vbat_cpu4 {
-				trip = <&low_vbat>; //触发源，对应于trips域。
-				cooling-device =
-					<&CPU4  THERMAL_MAX_LIMIT
-						THERMAL_MAX_LIMIT>;  //实际对应的cooling device。详见[补充2]。
-			};
-			vbat_cpu5 {
-				trip = <&low_vbat>;
-				cooling-device =
-					<&CPU5 THERMAL_MAX_LIMIT
-						THERMAL_MAX_LIMIT>;
-			};
-			vbat_map6 {
-				trip = <&low_vbat>;
-				cooling-device =
-					<&CPU6 THERMAL_MAX_LIMIT
-						THERMAL_MAX_LIMIT>;
-			};
-			vbat_map7 {
-				trip = <&low_vbat>;
-				cooling-device =
-					<&CPU7 THERMAL_MAX_LIMIT
-						THERMAL_MAX_LIMIT>;
-			};
-		};
-
-```	
+       polling-delay-passive = <100>; //当被动散热的cooling device达到迟滞值扫描区间时，将进行polling值为100ms间隔的时时监控。
+	polling-delay = <0>;
+	thermal-governor = "low_limits_cap"; //vbat Thermal Zone想使用的thermal governor为"low_limits_cap"策略（系统支援的thermal policy常见如下几种：
+	low_limits_floor、low_limits_cap、user_space、 step_wise，
+	其中user_space策略表示该Thermal Zone的kernel部分，将仅仅在达到Thermal阈值时发送一个uevent供userspace处理，
+	kernel部分除此之外什么也不做，userspace的处理者通常指的就是thermal-engine）。
+       thermal-sensors = <&bcl_sensor 2>; //该Thermal Zone所绑定的实际Thermal Sensor。
+	  trips {  //阈值触发点设置域。
+		 low_vbat: low-vbat {
+		 temperature = <3200>; //温度(对该Thermal Zone而言，返回值反应的其实是电压值)
+      		hysteresis = <100>; //迟滞值
+	       type = "passive"; //将要绑定到该Thermal Zone的cooling device的类型，
+	       目前有三种可选：passive、active、critical。详见[补充1].
+	      };
+	   };
+	   cooling-maps { //将要绑定的cooling device
+		  vbat_cpu4 {
+		  	trip = <&low_vbat>; //触发源，对应于trips域。
+		  	cooling-device =
+		  		<&CPU4  THERMAL_MAX_LIMIT
+		  			THERMAL_MAX_LIMIT>;  //实际对应的cooling device。详见[补充2]。
+	  		};
+	  		vbat_cpu5 {
+	  			trip = <&low_vbat>;
+	  			cooling-device =
+		  			<&CPU5 THERMAL_MAX_LIMIT
+		  				THERMAL_MAX_LIMIT>;
+ 			};
+ 			vbat_map6 {
+ 				trip = <&low_vbat>;
+ 				cooling-device =
+ 					<&CPU6 THERMAL_MAX_LIMIT
+ 						THERMAL_MAX_LIMIT>;
+ 			};
+ 			vbat_map7 {
+ 				trip = <&low_vbat>;
+ 				cooling-device =
+ 					<&CPU7 THERMAL_MAX_LIMIT
+ 						THERMAL_MAX_LIMIT>;
+ 			};
+ 		};
+ 		```
 
 ```
 [补充1]：
@@ -391,7 +398,7 @@ perf_floor ：设置该cooling device最低可允许的performance级别.
 
 ```
 > thermal_core.c 
-> of_thermal.c  
+> of_thermal.c 
 > gov_low_limit.c
 > step_wise.c
 > devfreq_cooling.c 
@@ -404,17 +411,17 @@ perf_floor ：设置该cooling device最低可允许的performance级别.
 ```
 1. thermal_of_cooling_device_register(parent->of_node, (char *)dev_name(&bd->dev), bd, &bd_cdev_ops); //可用来注册cooling device
 				
-	 ex: static struct thermal_cooling_device_ops bd_cdev_ops = {
-		.get_max_state = bd_cdev_get_max_brightness,
-		.get_cur_state = bd_cdev_get_cur_brightness,
-		.set_cur_state = bd_cdev_set_cur_brightness,
+	 Ex: static struct thermal_cooling_device_ops bd_cdev_ops = {
+	  .get_max_state = bd_cdev_get_max_brightness,
+	  .get_cur_state = bd_cdev_get_cur_brightness,
+	  .set_cur_state = bd_cdev_set_cur_brightness,
 	};
 
 2. thermal_register_governor(&thermal_gov_low_limits_cap); //可用来注册自定义的governor。
 
 	ex: static struct thermal_governor thermal_gov_low_limits_cap = {
-		.name		= "low_limits_cap",
-		.throttle	= low_limits_throttle,
+	  .name		= "low_limits_cap",
+	  .throttle	= low_limits_throttle,
 	};
 
 3. thermal_zone_of_sensor_register(&pdev->dev, BCL_SOC_MONITOR, soc_data, &soc_data->ops); //用来注册新的thermal zone。
@@ -441,7 +448,7 @@ struct thermal_zone_of_device_ops {
 	vbat->ops.get_temp = bcl_read_vbat_and_clear;
 	vbat->ops.set_trips = bcl_set_vbat;
 	vbat->tz_dev = thermal_zone_of_sensor_register(&pdev->dev,
-				type, vbat, &vbat->ops);
+			  type, vbat, &vbat->ops);
 ```
 
 接着我们需要调用device update函数，对该Thermal Zone进行首次的硬件寄存器trip值初始化
@@ -461,27 +468,25 @@ struct thermal_zone_of_device_ops {
 >>>     tz->ops->get\_trip\_hyst(tz, i, &hysteresis);
 >>>
 >>>    trip\_low = trip\_temp - hysteresis;
->>> 
 >>> }  //此处统一为用减法方式算出low trip值，在后面具体governor的trip过程中，不同governor会有不同的加减算法. Ex.加 low\_limits\_floor/low\_limits\_cap, 减step\_wise.
->>>    tz->ops->set\_trips(tz, low, high);  
+>>>    tz->ops->set\_trips(tz, low, high); 
 
->>>>  调用各thermal\_zone\_device注册时分别实现的set_trip函数，Ex. vbat->ops.set\_trips = bcl\_set\_vbat;
-
->>> }
+>>>>  -> 调用各thermal\_zone\_device注册时分别实现的set_trip函数，Ex. vbat->ops.set\_trips = bcl\_set\_vbat;
 
 >> handle\_thermal\_trip() 
 
 >>> {
->>> 
 >>> if (type == THERMAL\_TRIP\_CRITICAL || type == THERMAL\_TRIP\_HOT)
->>> 
->>> handle\_critical\_trips(tz, trip, type); //若dtsi中定义了 thermal trip critical 温度,对于上报的THERMAL\_TRIP\_CRITICA type，则此时就会关机orderly\_poweroff()。对于THERMAL\_TRIP\_HOT type则只是调用thermal\_zone\_device注册进来的notify函数做对应操作。
 >>>
->>> else   
+>>>   handle\_critical\_trips(tz, trip, type);    //若dtsi中定义了 thermal trip critical 温度,对于上报的trip type 为THERMAL\_TRIP\_CRITICA type，则此后会立即调用orderly\_poweroff()进行关机行为。
+而对于trip source为THERMAL\_TRIP\_HOT type，将只会调用thermal\_zone\_device注册进来的notify函数做对应操作。
+>>>
+>>> else 
 >>>
 >>> handle\_non\_critical\_trips(tz, trip, type);//常规运行路径 
 
->>>> **tz->governor->throttle(tz, trip)** 会调用所使用的governor throttle函数--> Ex. low\_limits\_cap governor的throttle函数 .throttle = low\_limits\_throttle (user\_space governor的throttle函数仅仅只会发送一个uevent而已) 
+>>>> **tz->governor->throttle(tz, trip)** 
+>>>> 该函数会会调用到该Thermal zone采用的Thermal governor所对应的throttle函数 --> Ex. low\_limits\_cap governor的throttle函数 .throttle = low\_limits\_throttle (对于user\_space governor的throttle函数来说，其仅仅只会发送一个uevent而已) 
 
 >>>>>	
 >>>>>   thermal\_zone\_trip\_update(tz, trip); 
@@ -502,19 +507,23 @@ struct thermal_zone_of_device_ops {
 >>>>>>   trip\_hyst = trip\_temp;
 >>>>>>   }
 >>>>>>   //对于low\_limits\_cap governor来说，它的hysteresis是做的加法，换句话说，电池电量大于trip值+hysteresis值后，才会debounce限制。其他governor大部分都是做减法。 Tips：虽然tsensor设备首次probe时调用的是thermal\_zone\_device\_update函数中所包含的thermal\_zone\_set\_trips()，且该函数中所设置的trip\_low = trip\_temp - hysteresis只有减法操作，但只要trip\_high一旦触发trip动作，则governor所对应的 thermal\_zone\_trip\_update 函数会再次根据实际需要，立即修正hysteresis的计算方式。
->>>>>>   
+>>>>>> 
 		
 >>>>>   list\_for\_each\_entry(instance, &tz->thermal\_instances, tz\_node)
 >>>>> 
 >>>>>   thermal\_cdev\_update(instance->cdev);
-``` //【调用对应colling device注册时注入的cooling_ops，ex.对于devfreq colling设备，会调用cdev->ops->set_min_state(cdev, min_target)，这样就会根据dtsi定义的state范围进行最大限制了。
-		static struct thermal_cooling_device_ops devfreq_cooling_ops = {
-		.get_max_state = devfreq_cooling_get_max_state,
-		.get_cur_state = devfreq_cooling_get_cur_state,
-		.set_cur_state = devfreq_cooling_set_cur_state,
-		.get_min_state = devfreq_cooling_get_min_state,
-		.set_min_state = devfreq_cooling_set_min_state,
-	};】```
+``` 
+调用对应colling device注册时注入的cooling_ops
+Ex.对于devfreq colling设备，会调用cdev->ops->set_min_state(cdev, min_target)，
+这样就会根据dtsi定义的state范围进行最大限制了。
+	 static struct thermal_cooling_device_ops devfreq_cooling_ops = {
+	  .get_max_state = devfreq_cooling_get_max_state,
+	  .get_cur_state = devfreq_cooling_get_cur_state,
+	  .set_cur_state = devfreq_cooling_set_cur_state,
+	  .get_min_state = devfreq_cooling_get_min_state,
+	  .set_min_state = devfreq_cooling_set_min_state,
+	};
+```
  
 >>>>> monitor\_thermal\_zone(tz); //达到trip点，开始polling
 >>>>> 
@@ -542,7 +551,7 @@ thermal_zone3
 
 以BCL的soc thermal Zone为例,可以看到如下资讯：
 ```
-/sys/class/thermal # ls thermal_zone63                             
+/sys/class/thermal # ls thermal_zone63 
 available_policies
 cdev0
 cdev0_lower_limit
@@ -592,45 +601,45 @@ uevent
 
 ```
 soc {
-		polling-delay-passive = <100>;
-		polling-delay = <0>;
-		thermal-governor = "low_limits_cap";
-		thermal-sensors = <&bcl_sensor 5>;
-		tracks-low;
+	  polling-delay-passive = <100>;
+	  polling-delay = <0>;
+	  thermal-governor = "low_limits_cap";
+	  thermal-sensors = <&bcl_sensor 5>;
+	  tracks-low;
 
-		trips {
-			low_soc: low-soc {
-				temperature = <10>;
-				hysteresis = <0>;
-				type = "passive";
-			};
-		};
-		cooling-maps {
-			soc_cpu4 {
-				trip = <&low_soc>;
-				cooling-device =
-					<&CPU4 THERMAL_MAX_LIMIT
-						THERMAL_MAX_LIMIT>;
-			};
-			soc_cpu5 {
-				trip = <&low_soc>;
-				cooling-device =
-					<&CPU5 THERMAL_MAX_LIMIT
-						THERMAL_MAX_LIMIT>;
-			};
-			soc_map6 {
-				trip = <&low_soc>;
-				cooling-device =
-					<&CPU6 THERMAL_MAX_LIMIT
-						THERMAL_MAX_LIMIT>;
-			};
-			soc_map7 {
-				trip = <&low_soc>;
-				cooling-device =
-					<&CPU7 THERMAL_MAX_LIMIT
-						THERMAL_MAX_LIMIT>;
-thermal-cpufreq-4			};
-		};
+	  trips {
+		  low_soc: low-soc {
+			  temperature = <10>;
+			  hysteresis = <0>;
+			  type = "passive";
+		  };
+	  };
+	  cooling-maps {
+		  soc_cpu4 {
+			  trip = <&low_soc>;
+			  cooling-device =
+				  <&CPU4 THERMAL_MAX_LIMIT
+					  THERMAL_MAX_LIMIT>;
+		  };
+		  soc_cpu5 {
+			  trip = <&low_soc>;
+			  cooling-device =
+				  <&CPU5 THERMAL_MAX_LIMIT
+					  THERMAL_MAX_LIMIT>;
+		  };
+		  soc_map6 {
+			  trip = <&low_soc>;
+			  cooling-device =
+				  <&CPU6 THERMAL_MAX_LIMIT
+					  THERMAL_MAX_LIMIT>;
+		  };
+		  soc_map7 {
+			  trip = <&low_soc>;
+			  cooling-device =
+				  <&CPU7 THERMAL_MAX_LIMIT
+				  THERMAL_MAX_LIMIT>;
+   		 };
+	  };
 	};
 ```
 driver node中各节点的含义如下：
